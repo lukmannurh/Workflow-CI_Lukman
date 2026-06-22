@@ -32,7 +32,7 @@ jobs:
         env:
           # Headless authentication for DagsHub tracking on GitHub Runner
           MLFLOW_TRACKING_USERNAME: "lukmannurh"
-          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }} 
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }} 
 
       - name: Build Docker Image from Registered Model
         run: |
