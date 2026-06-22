@@ -8,6 +8,10 @@ on:
 jobs:
   ci-pipeline:
     runs-on: ubuntu-latest
+    env:
+      MLFLOW_TRACKING_URI: "https://dagshub.com/lukmannurh/Eksperimen_SML_Lukman.mlflow"
+      MLFLOW_TRACKING_USERNAME: "lukmannurh"
+      MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
 
     steps:
       - name: Checkout Repository
@@ -29,14 +33,10 @@ jobs:
       - name: Run MLflow Project Re-training
         run: |
           mlflow run MLProject/ --env-manager local --entry-point main -P n_estimators=120 -P max_depth=10
-        env:
-          # Headless authentication for DagsHub tracking on GitHub Runner
-          MLFLOW_TRACKING_USERNAME: "lukmannurh"
-          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }} 
 
       - name: Build Docker Image from Registered Model
         run: |
-          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest" --env-manager local
+          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest" --env-manager pip
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
