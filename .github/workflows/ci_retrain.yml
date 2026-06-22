@@ -28,7 +28,7 @@ jobs:
 
       - name: Run MLflow Project Re-training
         run: |
-          mlflow run MLProject/ --no-conda --entry-point main -P n_estimators=120 -P max_depth=10
+          mlflow run MLProject/ --env-manager local --entry-point main -P n_estimators=120 -P max_depth=10
         env:
           # Headless authentication for DagsHub tracking on GitHub Runner
           MLFLOW_TRACKING_USERNAME: "lukmannurh"
@@ -36,7 +36,7 @@ jobs:
 
       - name: Build Docker Image from Registered Model
         run: |
-          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest" --no-conda
+          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest" --env-manager local
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
