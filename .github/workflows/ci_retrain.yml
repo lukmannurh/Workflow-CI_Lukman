@@ -1,0 +1,49 @@
+name: Re-train Model and Push to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.7'
+
+      - name: Install Base Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mlflow==2.19.0 dagshub scikit-learn pandas numpy
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run MLflow Project Re-training
+        run: |
+          mlflow run MLProject/ --no-conda --entry-point main -P n_estimators=120 -P max_depth=10
+        env:
+          # Headless authentication for DagsHub tracking on GitHub Runner
+          MLFLOW_TRACKING_USERNAME: "lukmannurh"
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }} 
+
+      - name: Build Docker Image from Registered Model
+        run: |
+          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest" --no-conda
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Image to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest
