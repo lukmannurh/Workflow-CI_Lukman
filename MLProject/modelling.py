@@ -15,7 +15,9 @@ def main():
     args = parser.parse_args()
 
     # Remote Tracking init
-    dagshub.init(repo_owner='lukmannurh', repo_name='Eksperimen_SML_Lukman', mlflow=True)
+    if not os.getenv("GITHUB_ACTIONS"):
+        import dagshub
+        dagshub.init(repo_owner='lukmannurh', repo_name='Eksperimen_SML_Lukman', mlflow=True)
     
     # Load Data
     data_path = os.path.join("namadataset_preprocessing", "cleaned_data.csv")
