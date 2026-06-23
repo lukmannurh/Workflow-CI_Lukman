@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Docker Image from Registered Model
         run: |
-          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest" --env-manager local
+          mlflow models build-docker -m "models:/credit-scoring-model/latest" -n "lukmanhakim404/credit_scoring_model:latest" --env-manager local
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -47,4 +47,4 @@ jobs:
 
       - name: Push Image to Docker Hub
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/credit_scoring_model:latest
+          docker push lukmanhakim404/credit_scoring_model:latest
